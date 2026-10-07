@@ -1,0 +1,2923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>初二历史月考选择题速刷复习</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    html, body {
+      height: 100dvh;
+      max-height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+    #app {
+      height: 100dvh;
+      max-height: 100dvh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 视图基础 */
+    .view {
+      display: none;
+      height: 100%;
+      width: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 10px) 14px env(safe-area-inset-bottom, 10px) 14px;
+    }
+    .view.active {
+      display: flex;
+    }
+
+    /* 顶部导航条 */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      min-height: 38px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 13.5px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+      padding: 3px 6px;
+    }
+    .page-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* 首页样式 */
+    .home-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .home-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+    .home-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 22px;
+    }
+    .home-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* 答题区核心卡片 - 严格一屏紧凑布局，取消底部按钮后垂直居中 */
+    .quiz-card {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin: 8px 0;
+      border: 1px solid var(--border);
+      box-shadow: 0 3px 12px -2px rgba(0, 0, 0, 0.05);
+      min-height: 0;
+    }
+    .meta-tags {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .meta-tag {
+      font-size: 11px;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .meta-source {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .question-box {
+      margin-bottom: 8px;
+    }
+    .question-text {
+      font-size: 15px;
+      line-height: 1.45;
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    /* 选项列表 */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .option-item {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: 13.5px;
+      line-height: 1.35;
+      color: #334155;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .option-item:active:not(.locked) {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+    .option-item.correct-reveal {
+      border-color: var(--success) !important;
+      background: var(--success-light) !important;
+      color: #166534 !important;
+      font-weight: 700;
+    }
+    .option-item.wrong-selected {
+      border-color: var(--danger) !important;
+      background: var(--danger-light) !important;
+      color: #991b1b !important;
+      font-weight: 700;
+    }
+
+    /* 反馈判定区 */
+    .feedback-box {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      display: none;
+      line-height: 1.4;
+      animation: fadeIn 0.15s ease-in-out;
+    }
+    .feedback-box.correct {
+      display: flex;
+      flex-direction: column;
+      background: var(--success-light);
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .feedback-box.wrong {
+      display: flex;
+      flex-direction: column;
+      background: var(--danger-light);
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .feedback-header {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 13px;
+    }
+    .explain-text {
+      margin-top: 3px;
+      color: #334155;
+      font-size: 12px;
+    }
+    .next-tip {
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.85;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* 底部操作按钮 */
+    .btn {
+      width: 100%;
+      height: 44px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:active {
+      background: var(--primary-dark);
+      transform: scale(0.99);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:active {
+      background: #e2e8f0;
+    }
+    .btn:disabled, .btn.disabled {
+      background: #e2e8f0 !important;
+      color: #94a3b8 !important;
+      border: none !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+      pointer-events: none;
+    }
+
+    /* 进度条 */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    /* 结算页面 */
+    .summary-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid var(--border);
+      margin: 10px 0;
+    }
+    .score-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      border: 4px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .score-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .score-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 14px;
+    }
+    .stat-item {
+      background: #f8fafc;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .stat-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .stat-name {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- 首页 -->
+  <div id="view-home" class="view active">
+    <div class="header-bar">
+      <div style="font-weight:700; color:var(--primary); font-size:14.5px;">📜 初二历史复习</div>
+      <div id="wrong-count-header" class="page-title">错题待复习: 0</div>
+    </div>
+    <div class="home-content">
+      <span class="badge">部编八上 · 即选即判极速刷题版</span>
+      <h1 class="home-title">初二历史上册<br>月考选择题复习</h1>
+      <p class="home-desc">严格依据教材重点及考卷提纲手写蓝字整理<br>涵盖第1课~第7课核心考点 (共137题)</p>
+      <div class="stat-pill">
+        <span>⚡ 点选选项自动判定</span>
+        <span>•</span>
+        <span>📱 手机单屏免滑动</span>
+      </div>
+      <div class="home-actions">
+        <button id="btn-start-all" class="btn btn-primary" onclick="startQuiz('all')">开始做题 (共137题)</button>
+        <button id="btn-review-wrong" class="btn btn-secondary disabled" onclick="startQuiz('wrong')">复习错题库 (0题)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 答题页 (零按钮极简单屏，点击选项即判题，轻触任意处或倒计时自动切下一题) -->
+  <div id="view-quiz" class="view" onclick="handleTapAnywhere(event)">
+    <div class="header-bar">
+      <button class="back-btn" onclick="exitToHome(event)">退出</button>
+      <div id="quiz-progress-text" class="page-title">第 1 / 137 题</div>
+      <div id="quiz-mode-tag" class="meta-tag" style="background:var(--primary-light); color:var(--primary);">全部题库</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div id="progress-bar-fill" class="progress-bar-fill"></div>
+    </div>
+
+    <div class="quiz-card">
+      <div>
+        <div class="meta-tags">
+          <span id="quiz-chapter-tag" class="meta-tag">第1课 鸦片战争</span>
+          <span id="quiz-page-source" class="meta-source">试卷第1页</span>
+        </div>
+
+        <div class="question-box">
+          <p id="question-text" class="question-text"></p>
+        </div>
+      </div>
+
+      <div>
+        <div id="options-group" class="options-group">
+          <!-- 选项由 JS 动态生成 -->
+        </div>
+
+        <div id="feedback-box" class="feedback-box">
+          <div id="feedback-header" class="feedback-header"></div>
+          <div id="explain-text" class="explain-text"></div>
+          <div id="next-tip" class="next-tip">轻触任意处继续 ➔</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结算页 -->
+  <div id="view-summary" class="view">
+    <div class="header-bar">
+      <div class="page-title" style="margin: 0 auto;">练习完成报告</div>
+    </div>
+    <div class="summary-card">
+      <div class="score-circle">
+        <div id="summary-rate" class="score-num">100%</div>
+        <div class="score-label">正确率</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div id="summary-total" class="stat-val">137</div>
+          <div class="stat-name">本次总题数</div>
+        </div>
+        <div class="stat-item">
+          <div id="summary-correct" class="stat-val" style="color:var(--success);">137</div>
+          <div class="stat-name">答对题数</div>
+        </div>
+        <div class="stat-item">
+          <div id="summary-wrong" class="stat-val" style="color:var(--danger);">0</div>
+          <div class="stat-name">答错题数</div>
+        </div>
+        <div class="stat-item">
+          <div id="summary-remaining-wrong" class="stat-val">0</div>
+          <div class="stat-name">错题库剩余</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <button id="btn-summary-wrong" class="btn btn-primary" onclick="startQuiz('wrong')">立即强化复习错题</button>
+      <button class="btn btn-secondary" onclick="exitToHome(event)">返回首页</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTION_DATABASE = [
+  {
+    "id": 1,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "虎门销烟",
+    "question": "1838年底，道光皇帝派力主禁烟的（ ）为钦差大臣，前往广东查禁鸦片。",
+    "options": [
+      "A. 曾国藩",
+      "B. 琦善",
+      "C. 关天培",
+      "D. 林则徐"
+    ],
+    "answer": "D",
+    "correct_text": "林则徐",
+    "explain": "根据教材与讲义知识点，正确答案是【林则徐】。"
+  },
+  {
+    "id": 2,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "虎门销烟",
+    "question": "（ ）是中国人民禁烟斗争的伟大胜利，显示了中华民族反抗外来侵略的坚强意志。",
+    "options": [
+      "A. 广州之战",
+      "B. 大沽口保卫战",
+      "C. 虎门销烟",
+      "D. 三元里抗英"
+    ],
+    "answer": "C",
+    "correct_text": "虎门销烟",
+    "explain": "根据教材与讲义知识点，正确答案是【虎门销烟】。"
+  },
+  {
+    "id": 3,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "英国发动侵华战争",
+    "question": "1840年6月，英国舰队封锁广东珠江口，（ ）爆发。",
+    "options": [
+      "A. 第二次鸦片战争",
+      "B. 八国联军侵华战争",
+      "C. 甲午中日战争",
+      "D. 鸦片战争"
+    ],
+    "answer": "D",
+    "correct_text": "鸦片战争",
+    "explain": "根据教材与讲义知识点，正确答案是【鸦片战争】。"
+  },
+  {
+    "id": 4,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "英国发动侵华战争",
+    "question": "英军到达天津大沽口威胁清廷，（ ）将林则徐革职查办，改派琦善为钦差大臣前往广州谈判。",
+    "options": [
+      "A. 乾隆皇帝",
+      "B. 嘉庆皇帝",
+      "C. 道光皇帝",
+      "D. 咸丰皇帝"
+    ],
+    "answer": "C",
+    "correct_text": "道光皇帝",
+    "explain": "根据教材与讲义知识点，正确答案是【道光皇帝】。"
+  },
+  {
+    "id": 5,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "英国发动侵华战争",
+    "question": "在谈判过程中，英军于1841年1月攻占大角、沙角炮台，并非法强占（ ）。",
+    "options": [
+      "A. 台湾岛",
+      "B. 澎湖列岛",
+      "C. 舟山群岛",
+      "D. 香港岛"
+    ],
+    "answer": "D",
+    "correct_text": "香港岛",
+    "explain": "根据教材与讲义知识点，正确答案是【香港岛】。"
+  },
+  {
+    "id": 6,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "英国发动侵华战争",
+    "question": "道光皇帝下诏对英作战，英军进攻（ ）后又占领广州城北的四方炮台。",
+    "options": [
+      "A. 大沽炮台",
+      "B. 沙角炮台",
+      "C. 吴淞炮台",
+      "D. 虎门炮台"
+    ],
+    "answer": "D",
+    "correct_text": "虎门炮台",
+    "explain": "根据教材与讲义知识点，正确答案是【虎门炮台】。"
+  },
+  {
+    "id": 7,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "《南京条约》的签订",
+    "question": "（ ）年8月，清政府被迫与英国签订了中英《南京条约》。",
+    "options": [
+      "A. 1841",
+      "B. 1840",
+      "C. 1842",
+      "D. 1844"
+    ],
+    "answer": "C",
+    "correct_text": "1842",
+    "explain": "根据教材与讲义知识点，正确答案是【1842】。"
+  },
+  {
+    "id": 8,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "《南京条约》的内容",
+    "question": "《南京条约》规定开放广州、福州、厦门、宁波、（ ）五处为通商口岸。",
+    "options": [
+      "A. 天津",
+      "B. 汉口",
+      "C. 上海",
+      "D. 南京"
+    ],
+    "answer": "C",
+    "correct_text": "上海",
+    "explain": "根据教材与讲义知识点，正确答案是【上海】。"
+  },
+  {
+    "id": 9,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "《南京条约》的内容",
+    "question": "《南京条约》规定割（ ）给英国。",
+    "options": [
+      "A. 香港岛",
+      "B. 九龙半岛",
+      "C. 辽东半岛",
+      "D. 台湾岛"
+    ],
+    "answer": "A",
+    "correct_text": "香港岛",
+    "explain": "根据教材与讲义知识点，正确答案是【香港岛】。"
+  },
+  {
+    "id": 10,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "《南京条约》的内容",
+    "question": "《南京条约》规定赔偿英国（ ）银元。",
+    "options": [
+      "A. 1500万",
+      "B. 4.5亿",
+      "C. 2100万",
+      "D. 1000万"
+    ],
+    "answer": "C",
+    "correct_text": "2100万",
+    "explain": "根据教材与讲义知识点，正确答案是【2100万】。"
+  },
+  {
+    "id": 11,
+    "page": 1,
+    "chapter": "第1课 鸦片战争",
+    "section": "《南京条约》的地位",
+    "question": "《南京条约》是中国近代史上第一个丧权辱国的（ ）。",
+    "options": [
+      "A. 同盟条约",
+      "B. 和平条约",
+      "C. 友好通商条约",
+      "D. 不平等条约"
+    ],
+    "answer": "D",
+    "correct_text": "不平等条约",
+    "explain": "根据教材与讲义知识点，正确答案是【不平等条约】。"
+  },
+  {
+    "id": 12,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "其他条约",
+    "question": "1843年，英国又强迫清政府签订《（ ）》，从中获得领事裁判权等特权。",
+    "options": [
+      "A. 《南京条约》",
+      "B. 《黄埔条约》",
+      "C. 《望厦条约》",
+      "D. 虎门条约"
+    ],
+    "answer": "D",
+    "correct_text": "虎门条约",
+    "explain": "根据教材与讲义知识点，正确答案是【虎门条约】。"
+  },
+  {
+    "id": 13,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "其他条约",
+    "question": "1843年中英条约中，英国从中获得（ ）、片面最惠国待遇和在通商口岸租地建房等权利。",
+    "options": [
+      "A. 租地建房权",
+      "B. 片面最惠国待遇",
+      "C. 领事裁判权",
+      "D. 关税协定权"
+    ],
+    "answer": "C",
+    "correct_text": "领事裁判权",
+    "explain": "根据教材与讲义知识点，正确答案是【领事裁判权】。"
+  },
+  {
+    "id": 14,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "其他条约",
+    "question": "1844年，清政府被迫与美国签订中美《（ ）》。",
+    "options": [
+      "A. 《虎门条约》",
+      "B. 《辛丑条约》",
+      "C. 《黄埔条约》",
+      "D. 望厦条约"
+    ],
+    "answer": "D",
+    "correct_text": "望厦条约",
+    "explain": "根据教材与讲义知识点，正确答案是【望厦条约】。"
+  },
+  {
+    "id": 15,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "其他条约",
+    "question": "1844年，清政府被迫与法国签订中法《（ ）》。",
+    "options": [
+      "A. 黄埔条约",
+      "B. 《望厦条约》",
+      "C. 《北京条约》",
+      "D. 《天津条约》"
+    ],
+    "answer": "A",
+    "correct_text": "黄埔条约",
+    "explain": "根据教材与讲义知识点，正确答案是【黄埔条约】。"
+  },
+  {
+    "id": 16,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "鸦片战争的影响",
+    "question": "鸦片战争改变了中国历史发展进程，中国（ ）的完整性遭到破坏。",
+    "options": [
+      "A. 传统文化",
+      "B. 独立主权",
+      "C. 军事力量",
+      "D. 领土范围"
+    ],
+    "answer": "B",
+    "correct_text": "独立主权",
+    "explain": "根据教材与讲义知识点，正确答案是【独立主权】。"
+  },
+  {
+    "id": 17,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "鸦片战争的影响",
+    "question": "鸦片战争后，中国传统的（ ）逐步瓦解，中国开始沦为半殖民地半封建社会。",
+    "options": [
+      "A. 官僚资本",
+      "B. 民族工业",
+      "C. 外国资本",
+      "D. 小农经济"
+    ],
+    "answer": "D",
+    "correct_text": "小农经济",
+    "explain": "根据教材与讲义知识点，正确答案是【小农经济】。"
+  },
+  {
+    "id": 18,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "鸦片战争的影响",
+    "question": "鸦片战争使中国开始沦为（ ）社会。",
+    "options": [
+      "A. 完全封建",
+      "B. 资本主义",
+      "C. 半殖民地半封建",
+      "D. 完全殖民地"
+    ],
+    "answer": "C",
+    "correct_text": "半殖民地半封建",
+    "explain": "根据教材与讲义知识点，正确答案是【半殖民地半封建】。"
+  },
+  {
+    "id": 19,
+    "page": 2,
+    "chapter": "第1课 鸦片战争",
+    "section": "鸦片战争的影响",
+    "question": "鸦片战争成为中国（ ）的开端。",
+    "options": [
+      "A. 当代史",
+      "B. 现代史",
+      "C. 古代史",
+      "D. 近代史"
+    ],
+    "answer": "D",
+    "correct_text": "近代史",
+    "explain": "根据教材与讲义知识点，正确答案是【近代史】。"
+  },
+  {
+    "id": 20,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "战争借口",
+    "question": "1856年，英国以“（ ）”为借口发动第二次鸦片战争。",
+    "options": [
+      "A. 亚罗号事件",
+      "B. 马神甫事件",
+      "C. 琉球事件",
+      "D. 虎门销烟"
+    ],
+    "answer": "A",
+    "correct_text": "亚罗号事件",
+    "explain": "根据教材与讲义知识点，正确答案是【亚罗号事件】。"
+  },
+  {
+    "id": 21,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "战争借口",
+    "question": "1856年，法国以“（ ）”为借口发动第二次鸦片战争。",
+    "options": [
+      "A. 马神甫事件",
+      "B. 东学党起义",
+      "C. 三元里抗英",
+      "D. 亚罗号事件"
+    ],
+    "answer": "A",
+    "correct_text": "马神甫事件",
+    "explain": "根据教材与讲义知识点，正确答案是【马神甫事件】。"
+  },
+  {
+    "id": 22,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "战争经过",
+    "question": "1856年10月，英军炮轰（ ），挑起第二次鸦片战争。",
+    "options": [
+      "A. 广州",
+      "B. 天津",
+      "C. 厦门",
+      "D. 上海"
+    ],
+    "answer": "A",
+    "correct_text": "广州",
+    "explain": "根据教材与讲义知识点，正确答案是【广州】。"
+  },
+  {
+    "id": 23,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "战争经过",
+    "question": "次年，英国和（ ）联合出兵，攻陷广州。",
+    "options": [
+      "A. 美国",
+      "B. 德国",
+      "C. 俄国",
+      "D. 法国"
+    ],
+    "answer": "D",
+    "correct_text": "法国",
+    "explain": "根据教材与讲义知识点，正确答案是【法国】。"
+  },
+  {
+    "id": 24,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《天津条约》",
+    "question": "《天津条约》规定西方列强获得外国公使进驻（ ）的特权。",
+    "options": [
+      "A. 上海",
+      "B. 广州",
+      "C. 北京",
+      "D. 南京"
+    ],
+    "answer": "C",
+    "correct_text": "北京",
+    "explain": "根据教材与讲义知识点，正确答案是【北京】。"
+  },
+  {
+    "id": 25,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《天津条约》",
+    "question": "《天津条约》规定外国商船和军舰可以在（ ）各口岸自由航行等特权。",
+    "options": [
+      "A. 珠江",
+      "B. 长江",
+      "C. 黄河",
+      "D. 淮河"
+    ],
+    "answer": "B",
+    "correct_text": "长江",
+    "explain": "根据教材与讲义知识点，正确答案是【长江】。"
+  },
+  {
+    "id": 26,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《通商章程善后条约》",
+    "question": "清政府在《通商章程善后条约》中，以“洋药”进口的名义承认（ ）。",
+    "options": [
+      "A. 外国公使进驻合法",
+      "B. 设立租界合法",
+      "C. 鸦片贸易合法",
+      "D. 自由传教合法"
+    ],
+    "answer": "C",
+    "correct_text": "鸦片贸易合法",
+    "explain": "根据教材与讲义知识点，正确答案是【鸦片贸易合法】。"
+  },
+  {
+    "id": 27,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "火烧圆明园",
+    "question": "英法联军进逼北京，（ ）让其弟奕䜣担任议和大臣，自己逃往承德避暑山庄。",
+    "options": [
+      "A. 光绪皇帝",
+      "B. 同治皇帝",
+      "C. 道光皇帝",
+      "D. 咸丰皇帝"
+    ],
+    "answer": "D",
+    "correct_text": "咸丰皇帝",
+    "explain": "根据教材与讲义知识点，正确答案是【咸丰皇帝】。"
+  },
+  {
+    "id": 28,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "火烧圆明园",
+    "question": "咸丰皇帝让他的弟弟（ ）担任议和大臣，留守北京。",
+    "options": [
+      "A. 李鸿章",
+      "B. 左宗棠",
+      "C. 奕䜣",
+      "D. 曾国藩"
+    ],
+    "answer": "C",
+    "correct_text": "奕䜣",
+    "explain": "根据教材与讲义知识点，正确答案是【奕䜣】。"
+  },
+  {
+    "id": 29,
+    "page": 2,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "火烧圆明园",
+    "question": "1860年10月，英法联军对北京西北郊的皇家园林——（ ）进行了大肆抢劫，然后放火烧毁。",
+    "options": [
+      "A. 故宫",
+      "B. 颐和园",
+      "C. 圆明园",
+      "D. 避暑山庄"
+    ],
+    "answer": "C",
+    "correct_text": "圆明园",
+    "explain": "根据教材与讲义知识点，正确答案是【圆明园】。"
+  },
+  {
+    "id": 30,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《北京条约》",
+    "question": "英法联军占领安定门，控制（ ），并扬言要直捣皇宫。",
+    "options": [
+      "A. 北京城",
+      "B. 天津卫",
+      "C. 承德山庄",
+      "D. 南京城"
+    ],
+    "answer": "A",
+    "correct_text": "北京城",
+    "explain": "根据教材与讲义知识点，正确答案是【北京城】。"
+  },
+  {
+    "id": 31,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《北京条约》",
+    "question": "《北京条约》中，清政府除承认《天津条约》有效外，又增开（ ）为通商口岸。",
+    "options": [
+      "A. 广州",
+      "B. 天津",
+      "C. 汉口",
+      "D. 上海"
+    ],
+    "answer": "B",
+    "correct_text": "天津",
+    "explain": "根据教材与讲义知识点，正确答案是【天津】。"
+  },
+  {
+    "id": 32,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "《北京条约》",
+    "question": "《北京条约》中，清政府割（ ）给英国，赔款额也大幅增加。",
+    "options": [
+      "A. 九龙半岛南端",
+      "B. 澳门半岛",
+      "C. 新界地区",
+      "D. 香港岛全岛"
+    ],
+    "answer": "A",
+    "correct_text": "九龙半岛南端",
+    "explain": "根据教材与讲义知识点，正确答案是【九龙半岛南端】。"
+  },
+  {
+    "id": 33,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "俄国侵占中国北方领土",
+    "question": "从19世纪50年代到80年代，俄国共割占中国东北和西北（ ）平方千米领土。",
+    "options": [
+      "A. 150多万",
+      "B. 60多万",
+      "C. 100多万",
+      "D. 44万多"
+    ],
+    "answer": "A",
+    "correct_text": "150多万",
+    "explain": "根据教材与讲义知识点，正确答案是【150多万】。"
+  },
+  {
+    "id": 34,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "俄国侵占中国北方领土",
+    "question": "俄国在1860年强迫清政府接受1858年签订的《（ ）》，割占中国东北100多万平方千米领土。",
+    "options": [
+      "A. 《北京条约》",
+      "B. 《勘分西北界约记》",
+      "C. 瑷珲条约",
+      "D. 《尼布楚条约》"
+    ],
+    "answer": "C",
+    "correct_text": "瑷珲条约",
+    "explain": "根据教材与讲义知识点，正确答案是【瑷珲条约】。"
+  },
+  {
+    "id": 35,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "第二次鸦片战争影响",
+    "question": "第二次鸦片战争使西方侵略势力由东南沿海一带深入（ ）地区。",
+    "options": [
+      "A. 黄河流域",
+      "B. 珠江流域",
+      "C. 长江中下游",
+      "D. 东北平原"
+    ],
+    "answer": "C",
+    "correct_text": "长江中下游",
+    "explain": "根据教材与讲义知识点，正确答案是【长江中下游】。"
+  },
+  {
+    "id": 36,
+    "page": 3,
+    "chapter": "第2课 第二次鸦片战争",
+    "section": "第二次鸦片战争影响",
+    "question": "第二次鸦片战争使中国的（ ）程度进一步加深。",
+    "options": [
+      "A. 封建化",
+      "B. 资本主义化",
+      "C. 完全沦陷",
+      "D. 半殖民地化"
+    ],
+    "answer": "D",
+    "correct_text": "半殖民地化",
+    "explain": "根据教材与讲义知识点，正确答案是【半殖民地化】。"
+  },
+  {
+    "id": 37,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "金田起义",
+    "question": "1851年1月11日，洪秀全在广西桂平（ ）发动武装起义，建号太平天国。",
+    "options": [
+      "A. 东乡",
+      "B. 金田村",
+      "C. 永安",
+      "D. 全州"
+    ],
+    "answer": "B",
+    "correct_text": "金田村",
+    "explain": "根据教材与讲义知识点，正确答案是【金田村】。"
+  },
+  {
+    "id": 38,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "金田起义",
+    "question": "太平天国起义军称（ ），不久洪秀全称天王。",
+    "options": [
+      "A. 太平军",
+      "B. 淮军",
+      "C. 湘军",
+      "D. 八旗军"
+    ],
+    "answer": "A",
+    "correct_text": "太平军",
+    "explain": "根据教材与讲义知识点，正确答案是【太平军】。"
+  },
+  {
+    "id": 39,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "永安建制",
+    "question": "太平军攻克（ ）后，洪秀全封王建制，初步建立起政权组织。",
+    "options": [
+      "A. 桂平",
+      "B. 永安",
+      "C. 金田",
+      "D. 武昌"
+    ],
+    "answer": "B",
+    "correct_text": "永安",
+    "explain": "根据教材与讲义知识点，正确答案是【永安】。"
+  },
+  {
+    "id": 40,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "永安建制",
+    "question": "永安建制中，洪秀全封（ ）为东王，节制诸王。",
+    "options": [
+      "A. 石达开",
+      "B. 萧朝贵",
+      "C. 韦昌辉",
+      "D. 杨秀清"
+    ],
+    "answer": "D",
+    "correct_text": "杨秀清",
+    "explain": "根据教材与讲义知识点，正确答案是【杨秀清】。"
+  },
+  {
+    "id": 41,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "永安建制",
+    "question": "永安建制中，洪秀全封萧朝贵为西王，冯云山为南王，（ ）为北王，石达开为翼王。",
+    "options": [
+      "A. 洪仁玕",
+      "B. 杨秀清",
+      "C. 韦昌辉",
+      "D. 冯云山"
+    ],
+    "answer": "C",
+    "correct_text": "韦昌辉",
+    "explain": "根据教材与讲义知识点，正确答案是【韦昌辉】。"
+  },
+  {
+    "id": 42,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "定都天京",
+    "question": "1853年3月，太平军攻占（ ），将其改名为天京，作为都城。",
+    "options": [
+      "A. 安庆",
+      "B. 武昌",
+      "C. 南京",
+      "D. 北京"
+    ],
+    "answer": "C",
+    "correct_text": "南京",
+    "explain": "根据教材与讲义知识点，正确答案是【南京】。"
+  },
+  {
+    "id": 43,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "定都天京",
+    "question": "太平军攻占南京后，将南京改名为（ ），作为都城。",
+    "options": [
+      "A. 盛京",
+      "B. 北京",
+      "C. 西京",
+      "D. 天京"
+    ],
+    "answer": "D",
+    "correct_text": "天京",
+    "explain": "根据教材与讲义知识点，正确答案是【天京】。"
+  },
+  {
+    "id": 44,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "《天朝田亩制度》",
+    "question": "太平天国定都天京后，颁布了纲领性文件《（ ）》。",
+    "options": [
+      "A. 《劝世良言》",
+      "B. 天朝田亩制度",
+      "C. 《天朝田制》",
+      "D. 《资政新篇》"
+    ],
+    "answer": "B",
+    "correct_text": "天朝田亩制度",
+    "explain": "根据教材与讲义知识点，正确答案是【天朝田亩制度】。"
+  },
+  {
+    "id": 45,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "《天朝田亩制度》",
+    "question": "《天朝田亩制度》规定不分男女，按（ ）和年龄平均分配土地。",
+    "options": [
+      "A. 财产多寡",
+      "B. 人口",
+      "C. 土地肥瘠",
+      "D. 官位品级"
+    ],
+    "answer": "B",
+    "correct_text": "人口",
+    "explain": "根据教材与讲义知识点，正确答案是【人口】。"
+  },
+  {
+    "id": 46,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "《天朝田亩制度》",
+    "question": "《天朝田亩制度》反映了千百年来农民要求得到（ ）的强烈愿望。",
+    "options": [
+      "A. 爵位",
+      "B. 土地",
+      "C. 粮食",
+      "D. 金钱"
+    ],
+    "answer": "B",
+    "correct_text": "土地",
+    "explain": "根据教材与讲义知识点，正确答案是【土地】。"
+  },
+  {
+    "id": 47,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "《天朝田亩制度》",
+    "question": "《天朝田亩制度》对于发动和鼓舞广大农民起来参加（ ）起了积极作用。",
+    "options": [
+      "A. 思想启蒙",
+      "B. 反侵略斗争",
+      "C. 夺取政权",
+      "D. 反封建斗争"
+    ],
+    "answer": "D",
+    "correct_text": "反封建斗争",
+    "explain": "根据教材与讲义知识点，正确答案是【反封建斗争】。"
+  },
+  {
+    "id": 48,
+    "page": 3,
+    "chapter": "第3课 太平天国运动",
+    "section": "《天朝田亩制度》",
+    "question": "《天朝田亩制度》带有浓厚的（ ），在长期的战争环境下未能推行。",
+    "options": [
+      "A. 科学民主",
+      "B. 封建专制",
+      "C. 空想色彩",
+      "D. 教条主义"
+    ],
+    "answer": "C",
+    "correct_text": "空想色彩",
+    "explain": "根据教材与讲义知识点，正确答案是【空想色彩】。"
+  },
+  {
+    "id": 49,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "北伐和西征",
+    "question": "经过三年多征战，西征取得重大胜利，太平天国军事上进入（ ）时期。",
+    "options": [
+      "A. 最终失败",
+      "B. 全盛",
+      "C. 由盛转衰",
+      "D. 初步兴起"
+    ],
+    "answer": "B",
+    "correct_text": "全盛",
+    "explain": "根据教材与讲义知识点，正确答案是【全盛】。"
+  },
+  {
+    "id": 50,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "天京事变",
+    "question": "1856年秋，东王（ ）逼洪秀全封他为“万岁”，意图篡位，最终被杀。",
+    "options": [
+      "A. 韦昌辉",
+      "B. 石达开",
+      "C. 洪仁玕",
+      "D. 杨秀清"
+    ],
+    "answer": "D",
+    "correct_text": "杨秀清",
+    "explain": "根据教材与讲义知识点，正确答案是【杨秀清】。"
+  },
+  {
+    "id": 51,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "天京事变",
+    "question": "天京事变使太平天国（ ）。",
+    "options": [
+      "A. 实现自立",
+      "B. 走向全盛",
+      "C. 彻底崩溃",
+      "D. 由盛转衰"
+    ],
+    "answer": "D",
+    "correct_text": "由盛转衰",
+    "explain": "根据教材与讲义知识点，正确答案是【由盛转衰】。"
+  },
+  {
+    "id": 52,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "《资政新篇》",
+    "question": "（ ）写成《资政新篇》，提出向西方学习、改革内政等主张。",
+    "options": [
+      "A. 洪秀全",
+      "B. 李秀成",
+      "C. 陈玉成",
+      "D. 洪仁玕"
+    ],
+    "answer": "D",
+    "correct_text": "洪仁玕",
+    "explain": "根据教材与讲义知识点，正确答案是【洪仁玕】。"
+  },
+  {
+    "id": 53,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "太平天国失败",
+    "question": "1862年，（ ）围困天京。",
+    "options": [
+      "A. 湘军",
+      "B. 绿营军",
+      "C. 洋枪队",
+      "D. 淮军"
+    ],
+    "answer": "A",
+    "correct_text": "湘军",
+    "explain": "根据教材与讲义知识点，正确答案是【湘军】。"
+  },
+  {
+    "id": 54,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "太平天国失败",
+    "question": "1864年夏，湘军攻陷天京，（ ）标志着太平天国运动失败。",
+    "options": [
+      "A. 天京陷落",
+      "B. 三河大捷",
+      "C. 天京事变",
+      "D. 安庆失陷"
+    ],
+    "answer": "A",
+    "correct_text": "天京陷落",
+    "explain": "根据教材与讲义知识点，正确答案是【天京陷落】。"
+  },
+  {
+    "id": 55,
+    "page": 4,
+    "chapter": "第3课 太平天国运动",
+    "section": "太平天国局限性",
+    "question": "由于（ ）的局限性，太平天国无法提出切合实际的革命纲领，在中外反动势力联合镇压下失败。",
+    "options": [
+      "A. 市民阶层",
+      "B. 农民阶级",
+      "C. 资产阶级",
+      "D. 地主阶级"
+    ],
+    "answer": "B",
+    "correct_text": "农民阶级",
+    "explain": "根据教材与讲义知识点，正确答案是【农民阶级】。"
+  },
+  {
+    "id": 56,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "洋务运动目的",
+    "question": "洋务运动利用西方先进技术，（ ），维护清王朝统治。",
+    "options": [
+      "A. 强兵富国",
+      "B. 民主共和",
+      "C. 发展民生",
+      "D. 师夷长技"
+    ],
+    "answer": "A",
+    "correct_text": "强兵富国",
+    "explain": "根据教材与讲义知识点，正确答案是【强兵富国】。"
+  },
+  {
+    "id": 57,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "洋务运动目的",
+    "question": "洋务运动的根本目的是维护（ ）统治。",
+    "options": [
+      "A. 清王朝",
+      "B. 资产阶级",
+      "C. 封建领主",
+      "D. 地方军阀"
+    ],
+    "answer": "A",
+    "correct_text": "清王朝",
+    "explain": "根据教材与讲义知识点，正确答案是【清王朝】。"
+  },
+  {
+    "id": 58,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "代表人物",
+    "question": "洋务派在中央以恭亲王（ ）为代表。",
+    "options": [
+      "A. 慈禧太后",
+      "B. 光绪皇帝",
+      "C. 曾国藩",
+      "D. 奕䜣"
+    ],
+    "answer": "D",
+    "correct_text": "奕䜣",
+    "explain": "根据教材与讲义知识点，正确答案是【奕䜣】。"
+  },
+  {
+    "id": 59,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "代表人物",
+    "question": "洋务派在地方以曾国藩、（ ）、左宗棠、张之洞等人为代表。",
+    "options": [
+      "A. 康有为",
+      "B. 梁启超",
+      "C. 奕䜣",
+      "D. 李鸿章"
+    ],
+    "answer": "D",
+    "correct_text": "李鸿章",
+    "explain": "根据教材与讲义知识点，正确答案是【李鸿章】。"
+  },
+  {
+    "id": 60,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "洋务运动口号",
+    "question": "洋务运动前期的口号是“（ ）”，后期主张“求富”。",
+    "options": [
+      "A. 民主",
+      "B. 自强",
+      "C. 求富",
+      "D. 变法"
+    ],
+    "answer": "B",
+    "correct_text": "自强",
+    "explain": "根据教材与讲义知识点，正确答案是【自强】。"
+  },
+  {
+    "id": 61,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "创办军事工业",
+    "question": "洋务派以“自强”为口号，先后创办（ ）、福州船政局等一批近代军事工业。",
+    "options": [
+      "A. 福州船政局",
+      "B. 安庆内军械所",
+      "C. 汉阳铁厂",
+      "D. 江南机器制造总局"
+    ],
+    "answer": "D",
+    "correct_text": "江南机器制造总局",
+    "explain": "根据教材与讲义知识点，正确答案是【江南机器制造总局】。"
+  },
+  {
+    "id": 62,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "近代教育",
+    "question": "洋务派为培养翻译和军事人才，兴办（ ），并设立翻译馆、派遣留学生等。",
+    "options": [
+      "A. 官办太学",
+      "B. 书院礼社",
+      "C. 新式学校",
+      "D. 私塾义塾"
+    ],
+    "answer": "C",
+    "correct_text": "新式学校",
+    "explain": "根据教材与讲义知识点，正确答案是【新式学校】。"
+  },
+  {
+    "id": 63,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "创办民用企业",
+    "question": "从19世纪70年代起，洋务派又提出“（ ）”主张，开办民用企业。",
+    "options": [
+      "A. 自强",
+      "B. 维新",
+      "C. 求富",
+      "D. 独立"
+    ],
+    "answer": "C",
+    "correct_text": "求富",
+    "explain": "根据教材与讲义知识点，正确答案是【求富】。"
+  },
+  {
+    "id": 64,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "创办民用企业",
+    "question": "洋务派开办一些近代（ ），以辅助军事工业。",
+    "options": [
+      "A. 民用企业",
+      "B. 军事工业",
+      "C. 官僚资本",
+      "D. 手工作坊"
+    ],
+    "answer": "A",
+    "correct_text": "民用企业",
+    "explain": "根据教材与讲义知识点，正确答案是【民用企业】。"
+  },
+  {
+    "id": 65,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "创办民用企业",
+    "question": "洋务派创办的民用企业中，比较重要的有轮船招商局、开平煤矿、（ ）、湖北织布局等。",
+    "options": [
+      "A. 大生纱厂",
+      "B. 汉阳铁厂",
+      "C. 福州船政局",
+      "D. 江南制造总局"
+    ],
+    "answer": "B",
+    "correct_text": "汉阳铁厂",
+    "explain": "根据教材与讲义知识点，正确答案是【汉阳铁厂】。"
+  },
+  {
+    "id": 66,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "筹建新式海军",
+    "question": "19世纪80年代初步建成的四支海军中，以（ ）规模最大。",
+    "options": [
+      "A. 福建水师",
+      "B. 南洋水师",
+      "C. 北洋舰队",
+      "D. 广东水师"
+    ],
+    "answer": "C",
+    "correct_text": "北洋舰队",
+    "explain": "根据教材与讲义知识点，正确答案是【北洋舰队】。"
+  },
+  {
+    "id": 67,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "筹建新式海军",
+    "question": "1885年，清政府成立（ ）统一协调指挥新式海军。",
+    "options": [
+      "A. 总理衙门",
+      "B. 外务部",
+      "C. 海军衙门",
+      "D. 农工商总局"
+    ],
+    "answer": "C",
+    "correct_text": "海军衙门",
+    "explain": "根据教材与讲义知识点，正确答案是【海军衙门】。"
+  },
+  {
+    "id": 68,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "评价洋务运动",
+    "question": "洋务运动在客观上促进了中国（ ）的产生。",
+    "options": [
+      "A. 小农经济",
+      "B. 外国资本主义",
+      "C. 封建自然经济",
+      "D. 民族资本主义"
+    ],
+    "answer": "D",
+    "correct_text": "民族资本主义",
+    "explain": "根据教材与讲义知识点，正确答案是【民族资本主义】。"
+  },
+  {
+    "id": 69,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "边疆危机",
+    "question": "1874年日本侵略中国台湾是以（ ）为借口。",
+    "options": [
+      "A. 琉球事件",
+      "B. 九连城事件",
+      "C. 亚罗号事件",
+      "D. 马神甫事件"
+    ],
+    "answer": "A",
+    "correct_text": "琉球事件",
+    "explain": "根据教材与讲义知识点，正确答案是【琉球事件】。"
+  },
+  {
+    "id": 70,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "收复新疆",
+    "question": "1875年5月，清政府任命（ ）为钦差大臣，督办新疆军务。",
+    "options": [
+      "A. 曾国藩",
+      "B. 左宗棠",
+      "C. 李鸿章",
+      "D. 张之洞"
+    ],
+    "answer": "B",
+    "correct_text": "左宗棠",
+    "explain": "根据教材与讲义知识点，正确答案是【左宗棠】。"
+  },
+  {
+    "id": 71,
+    "page": 5,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "收复新疆",
+    "question": "1878年，清军收复除（ ）以外的新疆领土，后又收回该地区大部分领土。",
+    "options": [
+      "A. 乌鲁木齐",
+      "B. 喀什噶尔",
+      "C. 吐鲁番",
+      "D. 伊犁地区"
+    ],
+    "answer": "D",
+    "correct_text": "伊犁地区",
+    "explain": "根据教材与讲义知识点，正确答案是【伊犁地区】。"
+  },
+  {
+    "id": 72,
+    "page": 6,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "中法战争",
+    "question": "中法战争中，法军进犯淡水，（ ）率部反击，取得胜利。",
+    "options": [
+      "A. 丁汝昌",
+      "B. 聂士成",
+      "C. 刘铭传",
+      "D. 邓世昌"
+    ],
+    "answer": "C",
+    "correct_text": "刘铭传",
+    "explain": "根据教材与讲义知识点，正确答案是【刘铭传】。"
+  },
+  {
+    "id": 73,
+    "page": 6,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "中法战争",
+    "question": "1885年初，老将（ ）取得镇南关大捷。",
+    "options": [
+      "A. 左宝贵",
+      "B. 徐邦道",
+      "C. 冯子材",
+      "D. 刘铭传"
+    ],
+    "answer": "C",
+    "correct_text": "冯子材",
+    "explain": "根据教材与讲义知识点，正确答案是【冯子材】。"
+  },
+  {
+    "id": 74,
+    "page": 6,
+    "chapter": "第4课 洋务运动和边疆危机",
+    "section": "中法战争",
+    "question": "1885年，清政府决定建立（ ），强化了对台湾的治理。",
+    "options": [
+      "A. 新疆行省",
+      "B. 台湾行省",
+      "C. 直隶省",
+      "D. 福建行省"
+    ],
+    "answer": "B",
+    "correct_text": "台湾行省",
+    "explain": "根据教材与讲义知识点，正确答案是【台湾行省】。"
+  },
+  {
+    "id": 75,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "甲午战争背景",
+    "question": "1894年，朝鲜发生（ ），清政府派兵帮助镇压，日本乘机出兵朝鲜。",
+    "options": [
+      "A. 太平天国运动",
+      "B. 东学党起义",
+      "C. 义和团运动",
+      "D. 白莲教起义"
+    ],
+    "answer": "B",
+    "correct_text": "东学党起义",
+    "explain": "根据教材与讲义知识点，正确答案是【东学党起义】。"
+  },
+  {
+    "id": 76,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "甲午战争爆发",
+    "question": "1894年7月，日军在牙山口外（ ）海面袭击清军运兵船，甲午中日战争爆发。",
+    "options": [
+      "A. 旅顺港",
+      "B. 大连湾",
+      "C. 威海卫",
+      "D. 丰岛"
+    ],
+    "answer": "D",
+    "correct_text": "丰岛",
+    "explain": "根据教材与讲义知识点，正确答案是【丰岛】。"
+  },
+  {
+    "id": 77,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "甲午战争爆发",
+    "question": "1894年是农历（ ）年，这场战争被称为“甲午中日战争”。",
+    "options": [
+      "A. 辛酉",
+      "B. 辛丑",
+      "C. 戊戌",
+      "D. 甲午"
+    ],
+    "answer": "D",
+    "correct_text": "甲午",
+    "explain": "根据教材与讲义知识点，正确答案是【甲午】。"
+  },
+  {
+    "id": 78,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "平壤战役",
+    "question": "平壤战役中，清军将领（ ）中炮牺牲。",
+    "options": [
+      "A. 叶志超",
+      "B. 丁汝昌",
+      "C. 邓世昌",
+      "D. 左宝贵"
+    ],
+    "answer": "D",
+    "correct_text": "左宝贵",
+    "explain": "根据教材与讲义知识点，正确答案是【左宝贵】。"
+  },
+  {
+    "id": 79,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "平壤战役",
+    "question": "平壤战役中，统帅叶志超弃城逃跑，（ ）陷落。",
+    "options": [
+      "A. 平壤",
+      "B. 仁川",
+      "C. 汉城",
+      "D. 釜山"
+    ],
+    "answer": "A",
+    "correct_text": "平壤",
+    "explain": "根据教材与讲义知识点，正确答案是【平壤】。"
+  },
+  {
+    "id": 80,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "黄海海战",
+    "question": "黄海海战中，北洋海军提督（ ）受伤后仍坚持督战。",
+    "options": [
+      "A. 邓世昌",
+      "B. 丁汝昌",
+      "C. 林永升",
+      "D. 左宝贵"
+    ],
+    "answer": "B",
+    "correct_text": "丁汝昌",
+    "explain": "根据教材与讲义知识点，正确答案是【丁汝昌】。"
+  },
+  {
+    "id": 81,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "黄海海战",
+    "question": "致远舰管带（ ）指挥官兵英勇战斗，与舰同沉。",
+    "options": [
+      "A. 左宝贵",
+      "B. 邓世昌",
+      "C. 徐邦道",
+      "D. 丁汝昌"
+    ],
+    "answer": "B",
+    "correct_text": "邓世昌",
+    "explain": "根据教材与讲义知识点，正确答案是【邓世昌】。"
+  },
+  {
+    "id": 82,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "黄海海战",
+    "question": "黄海海战中，（ ）损失较大，但主力尚存；战后李鸿章令舰队躲进军港避敌。",
+    "options": [
+      "A. 北洋舰队",
+      "B. 广东舰队",
+      "C. 南洋水师",
+      "D. 福建水师"
+    ],
+    "answer": "A",
+    "correct_text": "北洋舰队",
+    "explain": "根据教材与讲义知识点，正确答案是【北洋舰队】。"
+  },
+  {
+    "id": 83,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "辽东战役",
+    "question": "辽东战役中，旅顺总兵（ ）率部孤军迎敌，终因寡不敌众战败。",
+    "options": [
+      "A. 徐邦道",
+      "B. 左宝贵",
+      "C. 丁汝昌",
+      "D. 邓世昌"
+    ],
+    "answer": "A",
+    "correct_text": "徐邦道",
+    "explain": "根据教材与讲义知识点，正确答案是【徐邦道】。"
+  },
+  {
+    "id": 84,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "辽东战役",
+    "question": "日军占领（ ）后，连续进行了四天大屠杀，杀害了2万多中国人。",
+    "options": [
+      "A. 丹东",
+      "B. 威海卫",
+      "C. 旅顺",
+      "D. 大连"
+    ],
+    "answer": "C",
+    "correct_text": "旅顺",
+    "explain": "根据教材与讲义知识点，正确答案是【旅顺】。"
+  },
+  {
+    "id": 85,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "威海卫战役",
+    "question": "1895年初，日军进攻山东（ ），北洋舰队陷入绝境。",
+    "options": [
+      "A. 青岛港",
+      "B. 旅顺口",
+      "C. 威海卫",
+      "D. 大连湾"
+    ],
+    "answer": "C",
+    "correct_text": "威海卫",
+    "explain": "根据教材与讲义知识点，正确答案是【威海卫】。"
+  },
+  {
+    "id": 86,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "威海卫战役",
+    "question": "威海卫战役中，丁汝昌自杀殉国，（ ）全军覆没。",
+    "options": [
+      "A. 南洋水师",
+      "B. 广东舰队",
+      "C. 北洋舰队",
+      "D. 福建舰队"
+    ],
+    "answer": "C",
+    "correct_text": "北洋舰队",
+    "explain": "根据教材与讲义知识点，正确答案是【北洋舰队】。"
+  },
+  {
+    "id": 87,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "《马关条约》签订",
+    "question": "1895年3月，清政府派（ ）为议和全权大臣，前往日本马关议和。",
+    "options": [
+      "A. 奕䜣",
+      "B. 李鸿章",
+      "C. 曾国藩",
+      "D. 张之洞"
+    ],
+    "answer": "B",
+    "correct_text": "李鸿章",
+    "explain": "根据教材与讲义知识点，正确答案是【李鸿章】。"
+  },
+  {
+    "id": 88,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "《马关条约》内容",
+    "question": "《马关条约》清政府割辽东半岛、（ ）全岛及所有附属各岛屿、澎湖列岛给日本。",
+    "options": [
+      "A. 海南岛",
+      "B. 崇明岛",
+      "C. 舟山群岛",
+      "D. 台湾"
+    ],
+    "answer": "D",
+    "correct_text": "台湾",
+    "explain": "根据教材与讲义知识点，正确答案是【台湾】。"
+  },
+  {
+    "id": 89,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "《马关条约》内容",
+    "question": "《马关条约》规定开放沙市、（ ）、苏州、杭州为通商口岸。",
+    "options": [
+      "A. 广州",
+      "B. 天津",
+      "C. 重庆",
+      "D. 汉口"
+    ],
+    "answer": "C",
+    "correct_text": "重庆",
+    "explain": "根据教材与讲义知识点，正确答案是【重庆】。"
+  },
+  {
+    "id": 90,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "《马关条约》内容",
+    "question": "《马关条约》规定日本可在中国通商口岸（ ）等，加紧对华资本输出。",
+    "options": [
+      "A. 设立使馆",
+      "B. 开设工厂",
+      "C. 派驻军队",
+      "D. 开辟租界"
+    ],
+    "answer": "B",
+    "correct_text": "开设工厂",
+    "explain": "根据教材与讲义知识点，正确答案是【开设工厂】。"
+  },
+  {
+    "id": 91,
+    "page": 6,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "《马关条约》影响",
+    "question": "《马关条约》使中国的（ ）程度大大加深了。",
+    "options": [
+      "A. 封建专制化",
+      "B. 半殖民地化",
+      "C. 彻底沦丧",
+      "D. 资本主义化"
+    ],
+    "answer": "B",
+    "correct_text": "半殖民地化",
+    "explain": "根据教材与讲义知识点，正确答案是【半殖民地化】。"
+  },
+  {
+    "id": 92,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "三国干涉还辽",
+    "question": "《马关条约》签订后，俄、德、法三国迫使日本放弃（ ）。",
+    "options": [
+      "A. 朝鲜半岛",
+      "B. 澎湖列岛",
+      "C. 台湾全岛",
+      "D. 辽东半岛"
+    ],
+    "answer": "D",
+    "correct_text": "辽东半岛",
+    "explain": "根据教材与讲义知识点，正确答案是【辽东半岛】。"
+  },
+  {
+    "id": 93,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "瓜分狂潮",
+    "question": "列强在中国掀起抢夺路矿利权、强租租借地，划分“（ ）”的瓜分狂潮。",
+    "options": [
+      "A. 独立特区",
+      "B. 殖民领地",
+      "C. 势力范围",
+      "D. 保护属国"
+    ],
+    "answer": "C",
+    "correct_text": "势力范围",
+    "explain": "根据教材与讲义知识点，正确答案是【势力范围】。"
+  },
+  {
+    "id": 94,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "“门户开放”政策",
+    "question": "1899年，美国向英、俄、德、日、意、法六国提出“（ ）”照会。",
+    "options": [
+      "A. 门户开放",
+      "B. 武装干涉",
+      "C. 借师助剿",
+      "D. 利益均沾"
+    ],
+    "answer": "A",
+    "correct_text": "门户开放",
+    "explain": "根据教材与讲义知识点，正确答案是【门户开放】。"
+  },
+  {
+    "id": 95,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "“门户开放”政策",
+    "question": "“门户开放”政策要求在各国租借地和“势力范围”内享有（ ）机会。",
+    "options": [
+      "A. 均等贸易",
+      "B. 免税通行",
+      "C. 排他独占",
+      "D. 关税优惠"
+    ],
+    "answer": "A",
+    "correct_text": "均等贸易",
+    "explain": "根据教材与讲义知识点，正确答案是【均等贸易】。"
+  },
+  {
+    "id": 96,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "民族资本主义的发展",
+    "question": "状元实业家（ ）主动放弃高官厚禄，回到家乡创办大生纱厂。",
+    "options": [
+      "A. 卢作孚",
+      "B. 张謇",
+      "C. 荣宗敬",
+      "D. 范旭东"
+    ],
+    "answer": "B",
+    "correct_text": "张謇",
+    "explain": "根据教材与讲义知识点，正确答案是【张謇】。"
+  },
+  {
+    "id": 97,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "民族资本主义的发展",
+    "question": "张謇带动了很多中国人走上“（ ）”道路。",
+    "options": [
+      "A. 变法图强",
+      "B. 自强求富",
+      "C. 民主共和",
+      "D. 实业救国"
+    ],
+    "answer": "D",
+    "correct_text": "实业救国",
+    "explain": "根据教材与讲义知识点，正确答案是【实业救国】。"
+  },
+  {
+    "id": 98,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "民族工业特点",
+    "question": "近代中国民族工业主要集中在（ ）部门，重工业基础极为薄弱。",
+    "options": [
+      "A. 重工业",
+      "B. 造船业",
+      "C. 采矿业",
+      "D. 轻工业"
+    ],
+    "answer": "D",
+    "correct_text": "轻工业",
+    "explain": "根据教材与讲义知识点，正确答案是【轻工业】。"
+  },
+  {
+    "id": 99,
+    "page": 7,
+    "chapter": "第5课 甲午中日战争与列强瓜分中国狂潮",
+    "section": "民族工业特点",
+    "question": "近代中国民族工业地区分布极不平衡，主要集中在上海、武汉等沿海沿江的（ ）。",
+    "options": [
+      "A. 东北边疆",
+      "B. 偏远山区",
+      "C. 大城市",
+      "D. 内陆农村"
+    ],
+    "answer": "C",
+    "correct_text": "大城市",
+    "explain": "根据教材与讲义知识点，正确答案是【大城市】。"
+  },
+  {
+    "id": 100,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "公车上书背景",
+    "question": "1895年春，《（ ）》即将签订的消息传到国内，群情激愤。",
+    "options": [
+      "A. 《北京条约》",
+      "B. 《南京条约》",
+      "C. 《辛丑条约》",
+      "D. 马关条约"
+    ],
+    "answer": "D",
+    "correct_text": "马关条约",
+    "explain": "根据教材与讲义知识点，正确答案是【马关条约】。"
+  },
+  {
+    "id": 101,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "公车上书",
+    "question": "（ ）、梁启超等联合各省应试举人上书光绪皇帝，请求拒和、迁都、变法。",
+    "options": [
+      "A. 曾国藩",
+      "B. 李鸿章",
+      "C. 康有为",
+      "D. 张之洞"
+    ],
+    "answer": "C",
+    "correct_text": "康有为",
+    "explain": "根据教材与讲义知识点，正确答案是【康有为】。"
+  },
+  {
+    "id": 102,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "公车上书",
+    "question": "康有为、梁启超等联合各省举人上书（ ），请求拒和、迁都、变法。",
+    "options": [
+      "A. 咸丰皇帝",
+      "B. 光绪皇帝",
+      "C. 宣统皇帝",
+      "D. 同治皇帝"
+    ],
+    "answer": "B",
+    "correct_text": "光绪皇帝",
+    "explain": "根据教材与讲义知识点，正确答案是【光绪皇帝】。"
+  },
+  {
+    "id": 103,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "公车上书",
+    "question": "康有为、梁启超等联合应试举人上书的事件被称为“（ ）”。",
+    "options": [
+      "A. 百日维新",
+      "B. 公车上书",
+      "C. 同盟会成立",
+      "D. 洋务运动"
+    ],
+    "answer": "B",
+    "correct_text": "公车上书",
+    "explain": "根据教材与讲义知识点，正确答案是【公车上书】。"
+  },
+  {
+    "id": 104,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "公车上书影响",
+    "question": "公车上书拉开了（ ）的序幕。",
+    "options": [
+      "A. 义和团运动",
+      "B. 维新运动",
+      "C. 五四运动",
+      "D. 辛亥革命"
+    ],
+    "answer": "B",
+    "correct_text": "维新运动",
+    "explain": "根据教材与讲义知识点，正确答案是【维新运动】。"
+  },
+  {
+    "id": 105,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "维新运动开展",
+    "question": "公车上书失败后，维新人士在各地组织（ ），创办报刊。",
+    "options": [
+      "A. 商会",
+      "B. 同盟会",
+      "C. 政党",
+      "D. 学会"
+    ],
+    "answer": "D",
+    "correct_text": "学会",
+    "explain": "根据教材与讲义知识点，正确答案是【学会】。"
+  },
+  {
+    "id": 106,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "维新运动开展",
+    "question": "公车上书失败后，维新人士在各地组织学会，创办（ ）宣传变法。",
+    "options": [
+      "A. 学堂",
+      "B. 报刊",
+      "C. 工厂",
+      "D. 新军"
+    ],
+    "answer": "B",
+    "correct_text": "报刊",
+    "explain": "根据教材与讲义知识点，正确答案是【报刊】。"
+  },
+  {
+    "id": 107,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "维新运动报刊",
+    "question": "梁启超在上海的《（ ）》上发表《变法通议》。",
+    "options": [
+      "A. 《万国公报》",
+      "B. 《民报》",
+      "C. 时务报",
+      "D. 《新青年》"
+    ],
+    "answer": "C",
+    "correct_text": "时务报",
+    "explain": "根据教材与讲义知识点，正确答案是【时务报】。"
+  },
+  {
+    "id": 108,
+    "page": 7,
+    "chapter": "第6课 戊戌变法",
+    "section": "维新运动报刊",
+    "question": "严复等主持天津的《国闻报》，号召“（ ）”。",
+    "options": [
+      "A. 三民主义",
+      "B. 变法图强",
+      "C. 民主科学",
+      "D. 师夷长技"
+    ],
+    "answer": "B",
+    "correct_text": "变法图强",
+    "explain": "根据教材与讲义知识点，正确答案是【变法图强】。"
+  },
+  {
+    "id": 109,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "百日维新内容",
+    "question": "百日维新经济上鼓励私人兴办（ ），发展农工商业。",
+    "options": [
+      "A. 垄断行会",
+      "B. 洋务官局",
+      "C. 外商独资企业",
+      "D. 工矿企业"
+    ],
+    "answer": "D",
+    "correct_text": "工矿企业",
+    "explain": "根据教材与讲义知识点，正确答案是【工矿企业】。"
+  },
+  {
+    "id": 110,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "百日维新内容",
+    "question": "百日维新教育上废除（ ），改试策论。",
+    "options": [
+      "A. 诗赋策论",
+      "B. 算学经史",
+      "C. 八股文",
+      "D. 儒家经典"
+    ],
+    "answer": "C",
+    "correct_text": "八股文",
+    "explain": "根据教材与讲义知识点，正确答案是【八股文】。"
+  },
+  {
+    "id": 111,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "百日维新内容",
+    "question": "百日维新教育上创办（ ），这是近代中国最早的国立大学。",
+    "options": [
+      "A. 南洋公学",
+      "B. 同文馆",
+      "C. 京师大学堂",
+      "D. 清华学堂"
+    ],
+    "answer": "C",
+    "correct_text": "京师大学堂",
+    "explain": "根据教材与讲义知识点，正确答案是【京师大学堂】。"
+  },
+  {
+    "id": 112,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "戊戌政变",
+    "question": "1898年9月21日，（ ）等发动政变，软禁光绪皇帝，搜捕维新人士。",
+    "options": [
+      "A. 慈禧太后",
+      "B. 袁世凯",
+      "C. 荣禄",
+      "D. 奕䜣"
+    ],
+    "answer": "A",
+    "correct_text": "慈禧太后",
+    "explain": "根据教材与讲义知识点，正确答案是【慈禧太后】。"
+  },
+  {
+    "id": 113,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "戊戌六君子",
+    "question": "政变中，（ ）、刘光第、林旭、杨锐、杨深秀、康广仁六人被捕遇害。",
+    "options": [
+      "A. 康有为",
+      "B. 谭嗣同",
+      "C. 梁启超",
+      "D. 严复"
+    ],
+    "answer": "B",
+    "correct_text": "谭嗣同",
+    "explain": "根据教材与讲义知识点，正确答案是【谭嗣同】。"
+  },
+  {
+    "id": 114,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "戊戌六君子",
+    "question": "谭嗣同等六人被捕遇害，史称“（ ）”。",
+    "options": [
+      "A. 戊戌七君子",
+      "B. 同盟会诸子",
+      "C. 黄花岗七十二烈士",
+      "D. 戊戌六君子"
+    ],
+    "answer": "D",
+    "correct_text": "戊戌六君子",
+    "explain": "根据教材与讲义知识点，正确答案是【戊戌六君子】。"
+  },
+  {
+    "id": 115,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "变法意义",
+    "question": "戊戌变法促进了（ ）和民族意识的觉醒。",
+    "options": [
+      "A. 实业救国",
+      "B. 反清革命",
+      "C. 君主立宪",
+      "D. 思想启蒙"
+    ],
+    "answer": "D",
+    "correct_text": "思想启蒙",
+    "explain": "根据教材与讲义知识点，正确答案是【思想启蒙】。"
+  },
+  {
+    "id": 116,
+    "page": 8,
+    "chapter": "第6课 戊戌变法",
+    "section": "变法意义",
+    "question": "戊戌变法促进了思想启蒙和（ ）的觉醒。",
+    "options": [
+      "A. 阶级意识",
+      "B. 公民权利",
+      "C. 民族意识",
+      "D. 宗教崇拜"
+    ],
+    "answer": "C",
+    "correct_text": "民族意识",
+    "explain": "根据教材与讲义知识点，正确答案是【民族意识】。"
+  },
+  {
+    "id": 117,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团性质",
+    "question": "义和团是具有广泛群众性的（ ）组织。",
+    "options": [
+      "A. 农民起义",
+      "B. 反帝斗争",
+      "C. 反封建",
+      "D. 资产阶级政党"
+    ],
+    "answer": "B",
+    "correct_text": "反帝斗争",
+    "explain": "根据教材与讲义知识点，正确答案是【反帝斗争】。"
+  },
+  {
+    "id": 118,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团口号",
+    "question": "义和团提出了“（ ）”口号。",
+    "options": [
+      "A. 驱除鞑虏",
+      "B. 民主科学",
+      "C. 扶清灭洋",
+      "D. 自强求富"
+    ],
+    "answer": "C",
+    "correct_text": "扶清灭洋",
+    "explain": "根据教材与讲义知识点，正确答案是【扶清灭洋】。"
+  },
+  {
+    "id": 119,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团口号",
+    "question": "义和团统统排斥洋人及铁路等，具有（ ）的落后性。",
+    "options": [
+      "A. 民主理性",
+      "B. 崇尚科学",
+      "C. 崇洋媚外",
+      "D. 盲目排外"
+    ],
+    "answer": "D",
+    "correct_text": "盲目排外",
+    "explain": "根据教材与讲义知识点，正确答案是【盲目排外】。"
+  },
+  {
+    "id": 120,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团口号",
+    "question": "“扶清”反映出义和团对（ ）的本质认识不清，对它抱有幻想。",
+    "options": [
+      "A. 农民阶级",
+      "B. 义和团自身",
+      "C. 清政府",
+      "D. 外国列强"
+    ],
+    "answer": "C",
+    "correct_text": "清政府",
+    "explain": "根据教材与讲义知识点，正确答案是【清政府】。"
+  },
+  {
+    "id": 121,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团落后性",
+    "question": "义和团还带有（ ），相信降神附体、刀枪不入等。",
+    "options": [
+      "A. 科学理智",
+      "B. 迷信色彩",
+      "C. 现代主义",
+      "D. 反动性质"
+    ],
+    "answer": "B",
+    "correct_text": "迷信色彩",
+    "explain": "根据教材与讲义知识点，正确答案是【迷信色彩】。"
+  },
+  {
+    "id": 122,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "廊坊大捷",
+    "question": "义和团破坏沿线铁路，并在（ ）一带阻击八国联军，取得大捷。",
+    "options": [
+      "A. 廊坊",
+      "B. 西什库",
+      "C. 天津",
+      "D. 杨村"
+    ],
+    "answer": "A",
+    "correct_text": "廊坊",
+    "explain": "根据教材与讲义知识点，正确答案是【廊坊】。"
+  },
+  {
+    "id": 123,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "围攻使馆区",
+    "question": "在北京，义和团和清军围攻西什库教堂和（ ）的外国使馆。",
+    "options": [
+      "A. 紫竹林租界",
+      "B. 东交民巷",
+      "C. 西什库教堂",
+      "D. 圆明园"
+    ],
+    "answer": "B",
+    "correct_text": "东交民巷",
+    "explain": "根据教材与讲义知识点，正确答案是【东交民巷】。"
+  },
+  {
+    "id": 124,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "天津保卫战",
+    "question": "在天津保卫战中，直隶提督（ ）壮烈殉国。",
+    "options": [
+      "A. 丁汝昌",
+      "B. 左宝贵",
+      "C. 聂士成",
+      "D. 邓世昌"
+    ],
+    "answer": "C",
+    "correct_text": "聂士成",
+    "explain": "根据教材与讲义知识点，正确答案是【聂士成】。"
+  },
+  {
+    "id": 125,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "八国联军侵占北京",
+    "question": "八国联军攻陷北京，（ ）携光绪皇帝狼狈西逃。",
+    "options": [
+      "A. 奕䜣",
+      "B. 李鸿章",
+      "C. 慈禧太后",
+      "D. 端王载漪"
+    ],
+    "answer": "C",
+    "correct_text": "慈禧太后",
+    "explain": "根据教材与讲义知识点，正确答案是【慈禧太后】。"
+  },
+  {
+    "id": 126,
+    "page": 8,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团失败",
+    "question": "义和团在（ ）的联合镇压下最终失败。",
+    "options": [
+      "A. 外国八国联军",
+      "B. 资产阶级革命党",
+      "C. 中外反动势力",
+      "D. 清政府官军"
+    ],
+    "answer": "C",
+    "correct_text": "中外反动势力",
+    "explain": "根据教材与讲义知识点，正确答案是【中外反动势力】。"
+  },
+  {
+    "id": 127,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "义和团意义",
+    "question": "义和团运动虽然失败了，但它沉重打击了帝国主义（ ）的野心。",
+    "options": [
+      "A. 割让港口",
+      "B. 瓜分中国",
+      "C. 军事占领",
+      "D. 经济掠夺"
+    ],
+    "answer": "B",
+    "correct_text": "瓜分中国",
+    "explain": "根据教材与讲义知识点，正确答案是【瓜分中国】。"
+  },
+  {
+    "id": 128,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "八国联军罪行",
+    "question": "八国联军占领（ ）后，大肆屠杀、劫掠，充分暴露了侵略者的凶恶本性。",
+    "options": [
+      "A. 南京",
+      "B. 上海",
+      "C. 北京",
+      "D. 天津"
+    ],
+    "answer": "C",
+    "correct_text": "北京",
+    "explain": "根据教材与讲义知识点，正确答案是【北京】。"
+  },
+  {
+    "id": 129,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》签订",
+    "question": "（ ）年9月，清政府被迫同英、美等11国签订了《辛丑条约》。",
+    "options": [
+      "A. 1901",
+      "B. 1898",
+      "C. 1895",
+      "D. 1900"
+    ],
+    "answer": "A",
+    "correct_text": "1901",
+    "explain": "根据教材与讲义知识点，正确答案是【1901】。"
+  },
+  {
+    "id": 130,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》签订",
+    "question": "1901年9月，清政府被迫同11国签订了丧权辱国的《（ ）》。",
+    "options": [
+      "A. 《马关条约》",
+      "B. 《北京条约》",
+      "C. 《南京条约》",
+      "D. 辛丑条约"
+    ],
+    "answer": "D",
+    "correct_text": "辛丑条约",
+    "explain": "根据教材与讲义知识点，正确答案是【辛丑条约】。"
+  },
+  {
+    "id": 131,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》内容",
+    "question": "《辛丑条约》规定清政府赔款白银（ ）两，分39年还清，本息共计9.8亿两。",
+    "options": [
+      "A. 4.5亿",
+      "B. 2亿",
+      "C. 2100万",
+      "D. 9.8亿"
+    ],
+    "answer": "A",
+    "correct_text": "4.5亿",
+    "explain": "根据教材与讲义知识点，正确答案是【4.5亿】。"
+  },
+  {
+    "id": 132,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》内容",
+    "question": "《辛丑条约》划定北京（ ）为使馆界，允许各国派兵驻守，不准中国人居住。",
+    "options": [
+      "A. 圆明园",
+      "B. 紫禁城",
+      "C. 天坛公园",
+      "D. 东交民巷"
+    ],
+    "answer": "D",
+    "correct_text": "东交民巷",
+    "explain": "根据教材与讲义知识点，正确答案是【东交民巷】。"
+  },
+  {
+    "id": 133,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》内容",
+    "question": "《辛丑条约》规定拆毁（ ），允许外国军队驻扎在从北京到山海关的铁路沿线要地。",
+    "options": [
+      "A. 大沽炮台",
+      "B. 威海卫炮台",
+      "C. 吴淞炮台",
+      "D. 虎门炮台"
+    ],
+    "answer": "A",
+    "correct_text": "大沽炮台",
+    "explain": "根据教材与讲义知识点，正确答案是【大沽炮台】。"
+  },
+  {
+    "id": 134,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》内容",
+    "question": "《辛丑条约》规定改总理衙门为（ ），班列六部之前。",
+    "options": [
+      "A. 内阁大学士",
+      "B. 同文馆",
+      "C. 巡警部",
+      "D. 外务部"
+    ],
+    "answer": "D",
+    "correct_text": "外务部",
+    "explain": "根据教材与讲义知识点，正确答案是【外务部】。"
+  },
+  {
+    "id": 135,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》地位",
+    "question": "《（ ）》是中国近代史上赔款数目最庞大、主权丧失最严重的不平等条约。",
+    "options": [
+      "A. 辛丑条约",
+      "B. 《南京条约》",
+      "C. 《马关条约》",
+      "D. 《北京条约》"
+    ],
+    "answer": "A",
+    "correct_text": "辛丑条约",
+    "explain": "根据教材与讲义知识点，正确答案是【辛丑条约】。"
+  },
+  {
+    "id": 136,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》影响",
+    "question": "《辛丑条约》使清政府沦为列强统治中国的工具，中国（ ）半殖民地半封建社会的深渊。",
+    "options": [
+      "A. 初步形成",
+      "B. 完全陷入",
+      "C. 大大加深",
+      "D. 局部陷入"
+    ],
+    "answer": "B",
+    "correct_text": "完全陷入",
+    "explain": "根据教材与讲义知识点，正确答案是【完全陷入】。"
+  },
+  {
+    "id": 137,
+    "page": 9,
+    "chapter": "第7课 义和团运动和八国联军侵华",
+    "section": "《辛丑条约》影响",
+    "question": "《辛丑条约》使中国完全陷入（ ）社会的深渊。",
+    "options": [
+      "A. 封建君主专制",
+      "B. 半殖民地半封建",
+      "C. 完全资本主义",
+      "D. 完全殖民地"
+    ],
+    "answer": "B",
+    "correct_text": "半殖民地半封建",
+    "explain": "根据教材与讲义知识点，正确答案是【半殖民地半封建】。"
+  }
+];
+
+const STORAGE_KEY = 'history_exam_wrong_ids_mcq_v1';
+
+let currentMode = 'all'; // 'all' | 'wrong'
+let activeQuestions = [];
+let currentIndex = 0;
+let answeredCurrent = false;
+let autoNextTimer = null;
+
+// 统计
+let sessionTotal = 0;
+let sessionCorrect = 0;
+let sessionWrong = 0;
+
+function getWrongIds() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveWrongIds(ids) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...new Set(ids)]));
+  } catch (e) {}
+}
+
+function addWrongId(id) {
+  const ids = getWrongIds();
+  if (!ids.includes(id)) {
+    ids.push(id);
+    saveWrongIds(ids);
+  }
+}
+
+function removeWrongId(id) {
+  const ids = getWrongIds().filter(item => item !== id);
+  saveWrongIds(ids);
+}
+
+function switchView(viewId) {
+  clearTimeout(autoNextTimer);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+}
+
+function refreshHomeStats() {
+  const wrongIds = getWrongIds();
+  const count = wrongIds.length;
+  document.getElementById('wrong-count-header').textContent = `错题待复习: ${count}`;
+  const reviewBtn = document.getElementById('btn-review-wrong');
+  reviewBtn.textContent = `复习错题库 (${count}题)`;
+  if (count === 0) {
+    reviewBtn.classList.add('disabled');
+    reviewBtn.disabled = true;
+  } else {
+    reviewBtn.classList.remove('disabled');
+    reviewBtn.disabled = false;
+  }
+}
+
+function startQuiz(mode) {
+  currentMode = mode;
+  const wrongIds = getWrongIds();
+
+  if (mode === 'wrong') {
+    if (wrongIds.length === 0) {
+      alert('太棒了！当前错题库为空，无需复习！');
+      return;
+    }
+    activeQuestions = QUESTION_DATABASE.filter(q => wrongIds.includes(q.id));
+  } else {
+    activeQuestions = [...QUESTION_DATABASE];
+  }
+
+  currentIndex = 0;
+  sessionTotal = activeQuestions.length;
+  sessionCorrect = 0;
+  sessionWrong = 0;
+
+  switchView('view-quiz');
+  renderCurrentQuestion();
+}
+
+function renderCurrentQuestion() {
+  clearTimeout(autoNextTimer);
+  answeredCurrent = false;
+  const q = activeQuestions[currentIndex];
+
+  document.getElementById('quiz-progress-text').textContent = `第 ${currentIndex + 1} / ${activeQuestions.length} 题`;
+  document.getElementById('quiz-mode-tag').textContent = currentMode === 'wrong' ? '错题专项' : '全部题库';
+  document.getElementById('quiz-mode-tag').style.background = currentMode === 'wrong' ? '#fee2e2' : '#eff6ff';
+  document.getElementById('quiz-mode-tag').style.color = currentMode === 'wrong' ? '#b91c1c' : '#1d4ed8';
+
+  const progressPercent = ((currentIndex) / activeQuestions.length) * 100;
+  document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+
+  document.getElementById('quiz-chapter-tag').textContent = `${q.chapter} · ${q.section}`;
+  document.getElementById('quiz-page-source').textContent = `试卷第${q.page}页 / 第${q.id}题`;
+
+  document.getElementById('question-text').textContent = `${currentIndex + 1}. ${q.question}`;
+
+  // 渲染选项
+  const optionsGroup = document.getElementById('options-group');
+  optionsGroup.innerHTML = '';
+  q.options.forEach((optText) => {
+    const key = optText.trim()[0]; // 'A', 'B', 'C', 'D'
+    const optDiv = document.createElement('div');
+    optDiv.className = 'option-item';
+    optDiv.dataset.key = key;
+    optDiv.textContent = optText;
+    optDiv.onclick = (e) => {
+      e.stopPropagation();
+      handleSelectOption(key);
+    };
+    optionsGroup.appendChild(optDiv);
+  });
+
+  // 隐藏反馈
+  const feedback = document.getElementById('feedback-box');
+  feedback.style.display = 'none';
+  feedback.className = 'feedback-box';
+}
+
+// 点击选项：自动提交并即刻判定！
+function handleSelectOption(selectedKey) {
+  if (answeredCurrent) return;
+  answeredCurrent = true;
+
+  const q = activeQuestions[currentIndex];
+  const isRight = (selectedKey === q.answer);
+
+  const feedback = document.getElementById('feedback-box');
+  const feedbackHeader = document.getElementById('feedback-header');
+  const explainText = document.getElementById('explain-text');
+  const nextTip = document.getElementById('next-tip');
+
+  // 标注选项样式并加锁
+  document.querySelectorAll('.option-item').forEach(el => {
+    el.classList.add('locked');
+    const key = el.dataset.key;
+    if (key === q.answer) {
+      el.classList.add('correct-reveal');
+    }
+    if (!isRight && key === selectedKey) {
+      el.classList.add('wrong-selected');
+    }
+  });
+
+  if (isRight) {
+    sessionCorrect++;
+    feedback.className = 'feedback-box correct';
+    feedbackHeader.innerHTML = '<span>✅ 回答正确！</span>';
+    nextTip.textContent = currentIndex < activeQuestions.length - 1 ? '轻触任意处继续 ➔' : '轻触查看练习报告 ➔';
+    if (currentMode === 'wrong') {
+      removeWrongId(q.id);
+    }
+    // 答对时：1.4秒后自动切下一题（或轻触即刻切）
+    autoNextTimer = setTimeout(() => {
+      goToNext();
+    }, 1400);
+  } else {
+    sessionWrong++;
+    feedback.className = 'feedback-box wrong';
+    feedbackHeader.innerHTML = `<span>❌ 回答错误！正确答案：【${q.answer}. ${q.correct_text}】</span>`;
+    nextTip.textContent = currentIndex < activeQuestions.length - 1 ? '轻触任意处继续 ➔' : '轻触查看练习报告 ➔';
+    addWrongId(q.id);
+    // 答错时：留出更多时间读答案，也可随时点击屏幕直接跳过
+    autoNextTimer = setTimeout(() => {
+      goToNext();
+    }, 3200);
+  }
+
+  explainText.innerHTML = `<strong>考点解析：</strong>${q.explain}`;
+  feedback.style.display = 'flex';
+}
+
+// 轻触答题区任意位置：若已答题，立即跳过等待进入下一题
+function handleTapAnywhere(e) {
+  if (answeredCurrent) {
+    clearTimeout(autoNextTimer);
+    goToNext();
+  }
+}
+
+function goToNext() {
+  clearTimeout(autoNextTimer);
+  currentIndex++;
+  if (currentIndex < activeQuestions.length) {
+    renderCurrentQuestion();
+  } else {
+    showSummary();
+  }
+}
+
+// 键盘快捷键监听：按 A/B/C/D 自动判题，任意其他键或Enter/Space立即进入下一题
+document.addEventListener('keydown', (e) => {
+  const activeView = document.querySelector('.view.active');
+  if (activeView && activeView.id === 'view-quiz') {
+    const key = e.key.toUpperCase();
+    if (!answeredCurrent && ['A', 'B', 'C', 'D'].includes(key)) {
+      handleSelectOption(key);
+    } else if (answeredCurrent) {
+      clearTimeout(autoNextTimer);
+      goToNext();
+    }
+  }
+});
+
+function showSummary() {
+  clearTimeout(autoNextTimer);
+  switchView('view-summary');
+  const rate = sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0;
+  document.getElementById('summary-rate').textContent = `${rate}%`;
+  document.getElementById('summary-total').textContent = sessionTotal;
+  document.getElementById('summary-correct').textContent = sessionCorrect;
+  document.getElementById('summary-wrong').textContent = sessionWrong;
+
+  const remainingWrong = getWrongIds().length;
+  document.getElementById('summary-remaining-wrong').textContent = remainingWrong;
+
+  const wrongBtn = document.getElementById('btn-summary-wrong');
+  if (remainingWrong === 0) {
+    wrongBtn.textContent = '🎉 错题库已全部清空！';
+    wrongBtn.classList.add('disabled');
+    wrongBtn.disabled = true;
+  } else {
+    wrongBtn.textContent = `立即复习错题 (${remainingWrong}题)`;
+    wrongBtn.classList.remove('disabled');
+    wrongBtn.disabled = false;
+  }
+}
+
+function exitToHome(e) {
+  if (e) e.stopPropagation();
+  clearTimeout(autoNextTimer);
+  refreshHomeStats();
+  switchView('view-home');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  refreshHomeStats();
+});
+</script>
+</body>
+</html>
